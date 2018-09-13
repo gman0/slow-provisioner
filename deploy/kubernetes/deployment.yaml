@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slow-provisioner
+  labels:
+    app: slow-provisioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slow-provisioner
+  template:
+    metadata:
+      labels:
+        app: slow-provisioner
+    spec:
+      serviceAccount: slow-provisioner
+      containers:
+      - name: slow-provisioner
+        image: slow-provisioner:v0.3.0
+        imagePullPolicy: IfNotPresent
+        args:
+          - "--provisioner=slow-provisioner"
+          - "--nodeplugin=csi-slowplugin"

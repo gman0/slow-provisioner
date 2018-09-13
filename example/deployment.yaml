@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slow-deploy
+  labels:
+    app: slow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slow
+  template:
+    metadata:
+      labels:
+        app: slow
+    spec:
+      volumes:
+        - name: fake-slow
+          persistentVolumeClaim:
+            claimName: slow-pvc
+            readOnly: false
+      containers:
+        - name: slow
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: [ "/bin/sh", "-c", "trap : TERM INT; (while true; do sleep 1000; done) & wait" ]
+          volumeMounts:
+            - name: fake-slow
+              mountPath: /slow
